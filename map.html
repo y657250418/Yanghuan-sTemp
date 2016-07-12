@@ -1,0 +1,66 @@
+<!DOCTYPE html>  
+    <html>  
+    <head>  
+        <title>Leaflet Beijing</title>  
+        <meta charset="utf-8" />  
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+          
+        <!-- 引用 -->  
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.css" />  
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js"></script>  
+          
+        <!-- 引用本地 -->  
+        <!-- <link rel="stylesheet" href="debug/leaflet.css" />  
+        <script type="text/javascript" src="debug/deps.js"></script>  
+        <script src="debug/leaflet-include.js"></script> -->  
+          
+        <script>  
+            window.onload=function(){  
+			
+                //初始化地图控件,北京市坐标[39.9, 116.4]   
+                var map = L.map('map', {center: [39.9, 116.4],zoom: 12, doubleClickZoom: false});  
+                
+				//添加图层  
+				L.tileLayer('http://map.zhtu.net:8080/r3t-basemap/{z}/{x}/{y}/tile.jpg', {
+				    Zoom:12,
+					maxZoom: 18,
+					attribution: 'YangHuan'  
+				}).addTo(map); 	
+				
+				//添加比例尺
+				L.control.scale({
+					position:'topright',
+				}).addTo(map);
+				        
+				//给地图双击添加Marker  
+				var markers = new Array();	//保存所有的marker
+				var latlngs = new Array();	//保存需要连线的marker
+				var i = 0;
+                var popup = L.popup();  
+                function onMapDblClick(e) {  
+					//添加Maker
+					L.marker(e.latlng).addTo(map).bindPopup(e.latlng.toString()).openPopup();
+					markers[i] = e.latlng;
+					if(i > 0)
+					{
+						latlngs[0] = markers[i-1];
+						latlngs[1] = markers[i];
+						//按顺序将marker连线
+						var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+					}
+					i = i + 1;
+					
+					//使用popup顺序显示线段各点的经纬度
+					popup  
+                        .setLatLng(e.latlng)  
+                        .setContent("You clicked the map at " + e.latlng.toString())  
+                        .openOn(map);  
+                } 				
+                map.on('dblclick', onMapDblClick);  
+            };  
+        </script>  
+    </head>  
+    <body>  
+		<div id="map" style="width: 100%; height: 600px">></div>  
+    </body>  
+    </html>  
